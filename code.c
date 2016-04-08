@@ -11,11 +11,7 @@ int code (char* desc, void* v, FILE* f)
 }
 
 /* Funcao 
-fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
-escreve a string ptr no arquivo
-stream com nmemb elementos de tamanho size 
-
-size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream) */
+int fgetc(FILE *arq) retorna como int do primeiro byte do arquivo*/
 
 void one_field(FILE *f)
 {
@@ -42,8 +38,7 @@ void one_field(FILE *f)
 				/*implementar sabendo que inteiro tem que ser transformado com sinal */
 	}
 
-	printf("%d",num);
-	printf("\n");
+	printf("%d\n",num);
 
 	return;
 }
@@ -55,7 +50,7 @@ void one_struct(FILE *f)
 	for(i=0;i<BYTE-1;i++)
 		c=fgetc(f);								/* acaba de ler a marca FF da estrutura */
 
-	while(fgetc(f)==1)							/*confere se é o ultimo campo */
+	while(fgetc(f)==1)							/* confere se é o ultimo campo */
 		one_field(f);
 
 	one_field(f);								/* processa ultimo campo */
@@ -63,7 +58,7 @@ void one_struct(FILE *f)
 
 int decode (FILE *f)
 {
-	int i, c;
+	int i=1, c;
 
 	if(f == NULL)
 	{
@@ -71,12 +66,15 @@ int decode (FILE *f)
 		return -1;
 	}
 
-	while(fgetc(f)==1)
+	while(fgetc(f)==1)							/*	enquanto ainda é puxado bit valor 1 do arquivo		*/
 	{
-		printf("----------------------");
-		one_struct(f);							/*	enquanto ainda é puxado bit valor 1 do arquivo		*/
-												/*	processa uma estrutura escrevendo linha separadora	*/
-	}
+		printf("----------------------\nEstrutura %d\n",i);
+		one_struct(f);
+		i++;
+	}							
+
+	printf("----------------------\nEstrutura %d\n",i);	/*  processa a ultima struct do arquivo */
+	one_struct(f);	
 
 	return 0;
 }
