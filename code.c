@@ -3,24 +3,26 @@
 
 
 #include "code.h"
+#include <stdio.h>
 #include <math.h>
 #define BYTE 8
 
 int code (char* desc, void* v, FILE* f)
 {
 	/*esta funcao codifica o blablabla*/
+    return 0;
 }
 
-int one_field(FILE *f);
-int one_struct(FILE *c);
+void one_field(FILE *f);
+void one_struct(FILE *c);
 
 int decode (FILE *f)
 {
-	int i=1, c;
+    int i=1;
 
 	if(f == NULL)
 	{
-		printf("Erro na leitura do arquivo"); 	/* retorna -1 caso não leia arquivo */
+		printf("Erro na leitura do arquivo. \n"); 	/* retorna -1 caso não leia arquivo */
 		return -1;
 	}
 
@@ -41,7 +43,7 @@ int fgetc(FILE *arq) retorna como int do primeiro byte do arquivo*/
 
 void one_field(FILE *f)
 {
-	int i, numss=0, exp=0, numcs;
+	int i, c, numss=0, exp=0, numcs;
 
 	for(i=0;i<6;i++)
 		c=fgetc(f);							/*passa os 5 bits 0 da chave */
@@ -76,7 +78,7 @@ void one_field(FILE *f)
 
 void one_struct(FILE *f)
 {
-	int i, c, exp=0, num=0;
+    int i, c;
 
 	for(i=0;i<BYTE-1;i++)
 		c=fgetc(f);								/* acaba de ler a marca FF da estrutura */
