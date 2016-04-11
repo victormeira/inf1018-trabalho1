@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "code.h"
+#include "decode.h"
 
 int main (void){
 
