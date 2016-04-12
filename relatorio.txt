@@ -32,4 +32,20 @@ Estrutura 1
 <long>1024
 <long>-6208
 
-o que não era o esperado. 
+o que não era o esperado.
+
+Consertado alguns erros de interpretação do problema, o problema dos valores não serem os esperados persiste.
+
+Visto que haviam problemas na conversão dos bits de valor para int, especialmente por eles estarem "invertidos" em termos de adicionar exponencial de 2, o problema foi consertado. Com isso, o programa teve como output
+----------------------
+Estrutura 1
+<int>1
+<int>-1
+<long>256
+<long>-256
+----------------------
+Estrutura 2
+
+Porém, ainda há esse Estrutura 2 que não deveria estar no output.
+
+Trocando while(get_next(f)) por while(get_next(f)==1), o programa tem o output esperado.

@@ -9,7 +9,8 @@
 
 int get_next(FILE *f);
 void one_field(FILE *f);
-void one_struct(FILE *c);
+void one_struct(FILE *f);
+int one_num(FILE *f);
 
 int decode (FILE *f)
 {
@@ -17,11 +18,11 @@ int decode (FILE *f)
 
 	if(f == NULL)
 	{
-		printf("Erro na leitura do arquivo. \n"); 	/* retorna -1 caso não leia arquivo */
+		printf("Erro na leitura do arquivo. \n"); 	/* retorna -1 caso n‹o leia arquivo */
 		return -1;
 	}
 
-	while(get_next(f))							/*	enquanto ainda é puxado bit valor 1 do arquivo		*/
+	while(get_next(f)==1)							/*	enquanto ainda h‡ marca FF no arquivo*/
 	{
 		printf("----------------------\nEstrutura %d\n",i);
 		one_struct(f);
@@ -33,33 +34,20 @@ int decode (FILE *f)
 
 void one_field(FILE *f)
 {
-	int i, c, numss=0, exp=0, numcs;
+    int i, c;
+    
 
 	for(i=0;i<5;i++)
 		c=get_next(f);							/*passa os 5 bits 0 da chave */
 
-	if(get_next(f))							/*confere se é long ou int e imprime */
+	if(get_next(f))                             /*confere se é long ou int e imprime */
 		printf("<long>");
 	else
 		printf("<int>");
     
-    c=get_next(f);
-
-	while(get_next(f))						/*confere se é ultimo byte */
-	{
-		for(i=0;i<BYTE-1;i++,exp++)
-			numss = numss + get_next(f)*pow(2,exp); /* como contar o exponencial de tras pra frente? */
-	}
-
-	for(i=0;i<BYTE-1;i++,exp++) 			/* Processa ultimo byte */
-		numss = numss + get_next(f)*pow(2,exp);
-
-
-	numcs = numss >> 1;
-	if(numss & 0x01)
-		numcs = ~numcs;
+    c=get_next(f);                              /*percorre o char faltando no tipo */
 	
-	printf("%d\n",numcs);
+	printf("%d\n",one_num(f));
 
 	return;
 }
@@ -69,7 +57,7 @@ void one_struct(FILE *f)
     int i, c;
 
 	for(i=0;i<BYTE-1;i++)
-		c=get_next(f);								/* acaba de ler a marca FF da estrutura */
+		c=get_next(f);							/* acaba de ler a marca FF da estrutura */
 
 	while(get_next(f))							/* confere se é o ultimo campo */
 		one_field(f);
@@ -80,4 +68,28 @@ void one_struct(FILE *f)
 int get_next(FILE *f)
 {
     return fgetc(f)-'0';
+}
+
+int one_num(FILE *f)
+{
+    int numss=0, numcs, i, exp=0;
+    char str[BYTE-1];
+
+    
+    while(get_next(f))
+    {
+        fread(str,BYTE-1,1,f);                              /*le string de 7 bits correspondendo ao valor */
+        for(i=BYTE-2;i>-1;i--,exp++)
+            numss = numss + ((int)(str[i]-'0'))*pow(2,exp); /*percorre o vetor de tr‡s pra frente adicionando potencias de 2*/
+    }
+    
+    fread(str,BYTE-1,1,f);
+    for(i=BYTE-2;i>-1;i--,exp++)
+        numss = numss + ((int)(str[i]-'0'))*pow(2,exp);
+    
+    numcs = numss >>  1;
+    if (numss & 0x01)                           /* zigzag dado como dica */
+        numcs = ~numcs;
+    
+    return numcs;
 }
