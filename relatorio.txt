@@ -1,7 +1,8 @@
 /* Victor Meira Pinto 1420626 3WB */
-/* José Paulo Diniz   1510XXX 3WB */
+/* José Paulo Diniz   1510910 3WB */
 
-Implementação função decode:
+------------- Implementação função decode --------------
+
 Depois de decode ser totalmente programado, compilou-se pela primeira vez e notaram-se alguns warnings como váriaveis declaradas e não utilizadas entre outros.
 Após o conserto, rodou-se a main nesse formato:
 
@@ -36,7 +37,7 @@ o que não era o esperado.
 
 Consertado alguns erros de interpretação do problema, o problema dos valores não serem os esperados persiste.
 
-Visto que haviam problemas na conversão dos bits de valor para int, especialmente por eles estarem "invertidos" em termos de adicionar exponencial de 2, o problema foi consertado. Com isso, o programa teve como output
+Visto que haviam problemas na conversão dos bits de valor para int, especialmente por eles estarem "invertidos" em termos de adicionar exponencial de 2, o problema foi consertado. Com isso, o programa teve como output:
 ----------------------
 Estrutura 1
 <int>1
