@@ -22,4 +22,14 @@ int main (void){
 Com o arquivo teste sendo a tradução da estrutura dada no enunciado em formato binário. No primeiro teste o programa não funcionou, pois, os valores sendo recebidos pelo fgetc(f) estão sendo sempre -1, o que faz com que os whiles nunca sejam false.
 
 Encontrado o erro (faltou o arquivoteste.txt no final do path), rodando no modo de Debug, vemos que o fgetc nos da o valor 49 para quando ele recebe 1, pois ele lê como um código ASCII. Precisa-se achar uma forma de receber o valor do inteiro, e não o valor de sua representação como char.
+Criando uma função que retorna fgetc(file) - '0', resolve-se o problema.
 
+Rodando o programa novamente, o output foi:
+----------------------
+Estrutura 1
+<int>16
+<int>32
+<long>1024
+<long>-6208
+
+o que não era o esperado. 

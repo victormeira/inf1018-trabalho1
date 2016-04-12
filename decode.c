@@ -3,8 +3,11 @@
 
 #include <stdio.h>
 #include <math.h>
+#include "decode.h"
 #define BYTE 8
 
+
+int get_next(FILE *f);
 void one_field(FILE *f);
 void one_struct(FILE *c);
 
@@ -18,45 +21,38 @@ int decode (FILE *f)
 		return -1;
 	}
 
-	while(fgetc(f))							/*	enquanto ainda é puxado bit valor 1 do arquivo		*/
+	while(get_next(f))							/*	enquanto ainda é puxado bit valor 1 do arquivo		*/
 	{
 		printf("----------------------\nEstrutura %d\n",i);
 		one_struct(f);
 		i++;
 	}							
 
-	printf("----------------------\nEstrutura %d\n",i);	/*  processa a ultima struct do arquivo */
-	one_struct(f);	
-
 	return 0;
 }
-/* Funcao 
-int fgetc(FILE *arq) retorna como int do primeiro byte do arquivo*/
 
 void one_field(FILE *f)
 {
 	int i, c, numss=0, exp=0, numcs;
 
-	for(i=0;i<6;i++)
-		c=fgetc(f);							/*passa os 5 bits 0 da chave */
+	for(i=0;i<5;i++)
+		c=get_next(f);							/*passa os 5 bits 0 da chave */
 
-	if(fgetc(f))							/*confere se é long ou int e imprime */
+	if(get_next(f))							/*confere se é long ou int e imprime */
 		printf("<long>");
 	else
 		printf("<int>");
+    
+    c=get_next(f);
 
-	while(fgetc(f))						/*confere se é ultimo byte */
+	while(get_next(f))						/*confere se é ultimo byte */
 	{
 		for(i=0;i<BYTE-1;i++,exp++)
-		{
-			numss = numss + fgetc(f)*pow(2,exp);	/*implementar sabendo que inteiro tem que ser transformado com sinal */
-		}
+			numss = numss + get_next(f)*pow(2,exp); /* como contar o exponencial de tras pra frente? */
 	}
 
 	for(i=0;i<BYTE-1;i++,exp++) 			/* Processa ultimo byte */
-	{
-		numss = numss + fgetc(f)*pow(2,exp);		/*implementar sabendo que inteiro tem que ser transformado com sinal */
-	}
+		numss = numss + get_next(f)*pow(2,exp);
 
 
 	numcs = numss >> 1;
@@ -73,10 +69,15 @@ void one_struct(FILE *f)
     int i, c;
 
 	for(i=0;i<BYTE-1;i++)
-		c=fgetc(f);								/* acaba de ler a marca FF da estrutura */
+		c=get_next(f);								/* acaba de ler a marca FF da estrutura */
 
-	while(fgetc(f))							/* confere se é o ultimo campo */
+	while(get_next(f))							/* confere se é o ultimo campo */
 		one_field(f);
 
 	one_field(f);								/* processa ultimo campo */
+}
+
+int get_next(FILE *f)
+{
+    return fgetc(f)-'0';
 }
