@@ -1,1 +1,52 @@
-trabalho inf1018 - software basico - code e decode
+/* Victor Meira Pinto 1420626 3WB */
+/* José Paulo Diniz   1510910 3WB */
+
+------------- Implementação função decode --------------
+
+Depois de decode ser totalmente programado, compilou-se pela primeira vez e notaram-se alguns warnings como váriaveis declaradas e não utilizadas entre outros.
+Após o conserto, rodou-se a main nesse formato:
+
+int main (void){
+
+    FILE *input;
+    int i;
+
+    input = fopen("/Users/victorpinto/Desktop/inf1018-trabalho1/Trabalho1-INF1018/Trabalho1-INF1018","rb");
+
+    i=decode(input);
+
+    fclose(f);
+
+    return 0;
+}
+
+Com o arquivo teste sendo a tradução da estrutura dada no enunciado em formato binário. No primeiro teste o programa não funcionou, pois, os valores sendo recebidos pelo fgetc(f) estão sendo sempre -1, o que faz com que os whiles nunca sejam false.
+
+Encontrado o erro (faltou o arquivoteste.txt no final do path), rodando no modo de Debug, vemos que o fgetc nos da o valor 49 para quando ele recebe 1, pois ele lê como um código ASCII. Precisa-se achar uma forma de receber o valor do inteiro, e não o valor de sua representação como char.
+Criando uma função que retorna fgetc(file) - '0', resolve-se o problema.
+
+Rodando o programa novamente, o output foi:
+----------------------
+Estrutura 1
+<int>16
+<int>32
+<long>1024
+<long>-6208
+
+o que não era o esperado.
+
+Consertado alguns erros de interpretação do problema, o problema dos valores não serem os esperados persiste.
+
+Visto que haviam problemas na conversão dos bits de valor para int, especialmente por eles estarem "invertidos" em termos de adicionar exponencial de 2, o problema foi consertado. Com isso, o programa teve como output:
+----------------------
+Estrutura 1
+<int>1
+<int>-1
+<long>256
+<long>-256
+----------------------
+Estrutura 2
+
+Porém, ainda há esse Estrutura 2 que não deveria estar no output.
+
+Trocando while(get_next(f)) por while(get_next(f)==1), o programa tem o output esperado.
