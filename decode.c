@@ -2,15 +2,26 @@
 /* José Paulo Diniz   1510910 3WB */
 
 #include <stdio.h>
-#include <math.h>
 #include "decode.h"
-#define BYTE 8
 
+int decode (FILE *f);
+/* decodifica estruturas guardados no arquivo f*/
 
-int get_next(FILE *f);
-void one_field(FILE *f);
+unsigned char get_next(FILE *f);
+/* retorna prox 8 bits - 1 byte - do arquivo f */
+
+void one_field(FILE *f, unsigned char byte);
+/* print na tela um campo da estrutura */
+
 void one_struct(FILE *f);
-int one_num(FILE *f);
+/* print na tela uma estrutura */
+
+long one_num(FILE *f);
+/* retorna o numero guardado no par chave-valor */
+
+unsigned long one_num_byte(unsigned char byte, int n);
+/* retorna a porcao varint de um byte */
+
 
 int decode (FILE *f)
 {
@@ -18,11 +29,11 @@ int decode (FILE *f)
 
 	if(f == NULL)
 	{
-		printf("Erro na leitura do arquivo. \n"); 	/* retorna -1 caso n‹o leia arquivo */
+		printf("Erro na leitura do arquivo. \n");       /* retorna -1 caso n‹o leia arquivo */
 		return -1;
 	}
 
-	while(get_next(f)==1)							/*	enquanto ainda h‡ marca FF no arquivo*/
+	while(get_next(f) == 0xFF)							/*	enquanto ainda h‡ marca FF no arquivo*/
 	{
 		printf("----------------------\nEstrutura %d\n",i);
 		one_struct(f);
@@ -32,64 +43,71 @@ int decode (FILE *f)
 	return 0;
 }
 
-void one_field(FILE *f)
+void one_struct(FILE *f)
 {
-    int i, c;
+    unsigned char c;
     
-
-	for(i=0;i<5;i++)
-		c=get_next(f);							/*passa os 5 bits 0 da chave */
-
-	if(get_next(f))                             /*confere se é long ou int e imprime */
-		printf("<long>");
-	else
-		printf("<int>");
+    c = get_next(f);
     
-    c=get_next(f);                              /*percorre o char faltando no tipo */
+    while(c & 0x80)                             /* confere se é o ultimo campo */
+    {
+        one_field(f,c);
+        c = get_next(f);
+    }
+    
+    one_field(f,c);								/* processa ultimo campo */
+}
+
+void one_field(FILE *f, unsigned char byte)
+{
+
+    if(byte & 0x02)                             /*confere se penultimo bit e' 1 */
+        printf("<long>");
+    else
+        printf("<int>");
 	
-	printf("%d\n",one_num(f));
+	printf(" %ld\n",one_num(f));
 
 	return;
 }
 
-void one_struct(FILE *f)
+long one_num(FILE *f)
 {
-    int i, c;
-
-	for(i=0;i<BYTE-1;i++)
-		c=get_next(f);							/* acaba de ler a marca FF da estrutura */
-
-	while(get_next(f))							/* confere se é o ultimo campo */
-		one_field(f);
-
-	one_field(f);								/* processa ultimo campo */
+    unsigned char byte;
+    unsigned long numu = 0;
+    long nums;
+    int i;
+    
+    
+    for(i=0,byte = get_next(f); byte & 0x80 ; i++,byte = get_next(f)) /* vai de byte a byte do valor conferindo se 'e o ultimo*/
+        numu = numu + one_num_byte(byte, i);
+    
+    numu = numu + one_num_byte(byte, i);                /* adiciona o valor do ultimo */
+    
+    nums = numu >>  1;
+    if (numu & 0x01)                                     /* dado como dica no enunciado */
+        nums = ~nums;
+    
+    return nums;
 }
 
-int get_next(FILE *f)
+unsigned long one_num_byte(unsigned char byte, int n)
 {
-    return fgetc(f)-'0';
+    unsigned long num;
+    
+    num = byte & 0x7F;                                  /* seta o bit mais a esquerda a 0 */
+    
+    num = num << 7*n;                                   /* da shift para a esquerda o num de significancia do byte */
+    
+    return num;
 }
 
-int one_num(FILE *f)
-{
-    int numss=0, numcs, i, exp=0;
-    char str[BYTE-1];
 
+unsigned char get_next(FILE *f)
+{
+    unsigned char c;
     
-    while(get_next(f))
-    {
-        fread(str,BYTE-1,1,f);                              /*le string de 7 bits correspondendo ao valor */
-        for(i=BYTE-2;i>-1;i--,exp++)
-            numss = numss + ((int)(str[i]-'0'))*pow(2,exp); /*percorre o vetor de tr‡s pra frente adicionando potencias de 2*/
-    }
+    fread(&c,1,1,f);
     
-    fread(str,BYTE-1,1,f);
-    for(i=BYTE-2;i>-1;i--,exp++)
-        numss = numss + ((int)(str[i]-'0'))*pow(2,exp);
-    
-    numcs = numss >>  1;
-    if (numss & 0x01)                           /* zigzag dado como dica */
-        numcs = ~numcs;
-    
-    return numcs;
+    return c;
 }
