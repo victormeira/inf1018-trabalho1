@@ -1,1 +1,60 @@
-trabalho inf1018 - software basico - code e decode
+/* Victor Meira Pinto 1420626 3WB */
+/* José Paulo Diniz   1510910 3WB */
+
+--------------------------- Relatório de Testes ---------------------------
+
+Após a implementação de ambas funções, primeiro teste feito foi com, feito no IDE XCode no Mac:\
+
+typedef struct teste1 {
+int i1;
+int i2;
+long l1;
+long l2;
+} tpteste1;
+
+typedef struct teste2 {
+int i1;
+long l1;
+int i2;
+int i3;
+long l2;
+long l3;
+} tpteste2;
+
+tpteste1 t1 = {1, -1, 256, -256};
+tpteste2 t2 = {-1, -1, 0, 397, 0, 429};
+
+Com o resultado sendo o esperado. Nos dois casos temos números pequenos, longs e ints negativos, assim como longs e ints zero. Também funciona com mais de uma estrutura sendo que uma delas contém padding.
+Adicionando mais um estrutura ao teste, feito no IDE XCode no Mac:
+
+typedef struct teste3 {
+int i1;
+long l1;
+int i2;
+long l2;
+} tpteste3;
+
+tpteste3 t3 = {INT_MIN, LONG_MIN, INT_MAX, LONG_MAX};
+
+O resultado também é o esperado. Usando a biblioteca limits.h, nesse novo caso, pudemos testar o maior número possivel positivo e negativo tanto para long quanto para int na arquitetura 64 bits, quase que garantindo que qualquer valor possível funcionará na função.
+
+Indo para o OS Linux de 64 Bits:
+
+Rodando o segundo teste de novo, temos o resultado esperado.
+
+Fazendo um teste com structs com apenas um int e um long:
+
+typedef struct teste1 {
+	int i1;
+} tpteste1;
+
+typedef struct teste2 {
+	long l1;
+} tpteste2;
+
+t1 = {0};
+t2 = {0};
+
+O resultado também foi o esperado.
+
+
