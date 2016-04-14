@@ -1,23 +1,19 @@
-#ifndef STDIO
-#define STDIO
-#include <stdio.h>
-#endif
-
+/* Victor Meira Pinto 1420626 3WB */
+/* José Paulo Diniz   1510910 3WB */
 #include <string.h>
-#include <math.h>
 #include <stdlib.h>
 #include "code.h"
 
 typedef union value {
 	int vInt;
-	long long vLong;
+	long vLong;
 } tpValue;
 
 void codeValue(char *desc, int inx, void *v, FILE *f);
 
-void printValue(char type, long long value, FILE *f);
+void printValue(char type, long value, FILE *f);
 
-int numBits (long long value);
+int numBits (long value);
 
 int decode (FILE *f);
 /* decodifica estruturas guardados no arquivo f*/
@@ -52,8 +48,7 @@ int code (char* desc, void* v, FILE* f)
 		return -1;
 	}
 
-	printf("%02x ", 0xFF); /*first byte is always FF*/
-	fwrite(&firstByte, 1, 1, f);
+	fwrite(&firstByte, 1, 1, f); /*first byte is always FF*/
 
 	for (; i != num_fields; i++) {
 		key = 0;
@@ -66,12 +61,10 @@ int code (char* desc, void* v, FILE* f)
 		else if (desc[i] == 'l')
 			key = key | 0x02;
 
-		printf("%02x ", key);
 		fwrite(&key, 1, 1, f);
 
 		codeValue(desc, i, &pVal, f);
 	}
-	printf("\n");
 
 	return 0;
 }
@@ -89,7 +82,7 @@ void codeValue(char *desc, int inx, void *v, FILE *f) {
 		if (intBeforeLong % 2 != 0){
 			pVal += 4;
 		}
-		val.vLong = *(signed long long*)pVal;
+		val.vLong = *(signed long*)pVal;
 		printValue('l', val.vLong, f);
 	}
 	else if (desc[inx] == 'i') {
@@ -104,8 +97,8 @@ void codeValue(char *desc, int inx, void *v, FILE *f) {
 	*(void **)v = pVal;
 }
 
-void printValue(char type, long long value, FILE *f) {
-	unsigned long long val;
+void printValue(char type, long value, FILE *f) {
+	unsigned long val;
 	int bitSize, byteSize, i;
 	unsigned char *codedValue;
 
@@ -128,16 +121,13 @@ void printValue(char type, long long value, FILE *f) {
 	}
 	codedValue[i] = val;
 
-	for (i=0; i<byteSize; i++) {
-		printf("%02x ", codedValue[i]);
-	}
 	fwrite(codedValue, 1, byteSize, f);
 }
 
-int numBits (long long value) {
+int numBits (long value) {
 	int num = 64;
-	long long lastBit = 0x8000000000000000;
-	long long val = value;
+	long lastBit = 0x8000000000000000;
+	long val = value;
 
 	for (; (num >= 0)&&!(val & lastBit); num--)
 		val <<= 1;
