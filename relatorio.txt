@@ -3,7 +3,7 @@
 
 --------------------------- Relatório de Testes ---------------------------
 
-Após a implementação de ambas funções, primeiro teste feito foi com, feito no IDE XCode no Mac:\
+Após a implementação de ambas funções, primeiro teste feito foi com (no IDE XCode no Mac):
 
 typedef struct teste1 {
 int i1;
@@ -24,8 +24,8 @@ long l3;
 tpteste1 t1 = {1, -1, 256, -256};
 tpteste2 t2 = {-1, -1, 0, 397, 0, 429};
 
-Com o resultado sendo o esperado. Nos dois casos temos números pequenos, longs e ints negativos, assim como longs e ints zero. Também funciona com mais de uma estrutura sendo que uma delas contém padding.
-Adicionando mais um estrutura ao teste, feito no IDE XCode no Mac:
+Com o resultado sendo o esperado. Nos dois casos temos números pequenos -- sendo o primeiro teste o dado no enunciado -- longs e ints negativos, assim como longs e ints zero. Também funciona com mais de uma estrutura sendo que uma delas contém padding.
+Adicionando mais um estrutura ao teste (no IDE XCode no Mac):
 
 typedef struct teste3 {
 int i1;
@@ -40,9 +40,9 @@ O resultado também é o esperado. Usando a biblioteca limits.h, nesse novo caso
 
 Indo para o OS Linux de 64 Bits:
 
-Rodando o segundo teste de novo, temos o resultado esperado.
+Rodando o primeiro e segundo teste de novo, temos os resultados esperados.
 
-Fazendo um teste com structs com apenas um int e um long:
+Fazendo um teste com structs com apenas um int e um long com valor zero:
 
 typedef struct teste1 {
 	int i1;
@@ -57,4 +57,73 @@ t2 = {0};
 
 O resultado também foi o esperado.
 
+Fazendo teste com uma struct de tamanho grande e com números escolhidos aleatóriamente:
+
+typedef struct teste1 {
+	int i1;
+	int i2;
+	int i3;
+	int i4;
+	int i5;
+	int i6;
+	int i7;
+	int i8;
+	int i9;
+	int i10;
+	long l1;
+	long l2;
+	long l3;
+	long l4;
+	long l5;
+	long l6;
+	long l7;
+	long l8;
+	long l9;
+	long l10;
+	int i11;
+    long l11;
+    int i12;
+    long l12;
+    int i13;
+    long l13;
+    int i14;
+    long l14;
+    int i15;
+    long l15;
+    int i16;
+    long l16;
+} tpteste1;
+
+tpteste1 t1 = {	6940198,	86458931,
+				-196391019,	23071760,
+				124661831,	192045037,
+				-9186249,	-206193842,
+				117913202,	171574294,
+				-107473100,	-143267096,
+				-116703952,	4570303,
+				190226540,	-200459939,
+				25882483,	161273782,
+				100942337,	-52118666,
+				-166644708,	-191343501,
+				-113360728,	61880132,
+				-25908459,	154864940,
+				-145112738,	20150645,
+				193809402,	-175821588,
+				108020125,	-103881548};
+
+O programa também funcionou e gerou o resultado esperado.
+
+Com isso, conclui-se a bateria de testes.
+
+--------------------------- Checklist de Testes ---------------------------
+[X]	Teste dado no Enunciado
+[X]	Valores positivos para int e long
+[X]	Valores negativos para int e long
+[X]	Valores zero para int e long
+[X]	Maiores valores possíveis para int e long
+[X]	Menores valores possíveis para int e long
+[X] Múltiplas structs em arquivo
+[X]	Structs sem padding
+[X]	Structs com padding
+[X] Structs de com grande número de campos
 

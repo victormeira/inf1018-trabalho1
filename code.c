@@ -1,5 +1,6 @@
 /* Victor Meira Pinto 1420626 3WB */
-/* JosÈ Paulo Diniz   1510910 3WB */
+/* Jos√© Paulo Diniz   1510910 3WB */
+
 #ifndef STDIO
 #define STDIO
 #include <stdio.h>
@@ -145,11 +146,11 @@ int decode (FILE *f)
 
 	if(f == NULL)
 	{
-		printf("Erro na leitura do arquivo. \n");       /* retorna -1 caso não leia arquivo */
+		printf("Erro na leitura do arquivo. \n");       /* retorna -1 caso n√£o leia arquivo */
 		return -1;
 	}
 
-	while(get_next(f) == 0xFF)							/*	enquanto ainda há marca FF no arquivo*/
+	while(get_next(f) == 0xFF)							/*	enquanto ainda h√° marca FF no arquivo*/
 	{
 		printf("----------------------\nEstrutura %d\n",i);
 		one_struct(f);
@@ -165,7 +166,7 @@ void one_struct(FILE *f)
     
     c = get_next(f);
     
-    while(c & 0x80)                             /* confere se È o ultimo campo */
+    while(c & 0x80)                             /* confere se √© o ultimo campo */
     {
         one_field(f,c);
         c = get_next(f);
@@ -177,7 +178,7 @@ void one_struct(FILE *f)
 void one_field(FILE *f, unsigned char byte)
 {
 
-    if(byte & 0x02)                             /*confere se penultimo bit e' 1 */
+    if(byte & 0x02)                             /*confere se penultimo bit √© 1 */
         printf("<long>");
     else
         printf("<int>");
@@ -195,7 +196,7 @@ long one_num(FILE *f)
     int i;
     
     
-    for(i=0,byte = get_next(f); byte & 0x80 ; i++,byte = get_next(f)) /* vai de byte a byte do valor conferindo se 'e o ultimo*/
+    for(i=0,byte = get_next(f); byte & 0x80 ; i++,byte = get_next(f)) /* vai de byte a byte do valor conferindo se √© o ultimo*/
         numu = numu + one_num_byte(byte, i);
     
     numu = numu + one_num_byte(byte, i);                /* adiciona o valor do ultimo */
@@ -212,7 +213,6 @@ unsigned long one_num_byte(unsigned char byte, int n)
     unsigned long num;
     
     num = byte & 0x7F;                                  /* seta o bit mais a esquerda a 0 */
-    
     num = num << 7*n;                                   /* da shift para a esquerda o num de significancia do byte */
     
     return num;
