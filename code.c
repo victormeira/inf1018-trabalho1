@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "code.h"
+#define MAX ((sizeof(long)*8)/7+1)
 
 typedef union value {
 	int vInt;
@@ -29,15 +30,8 @@ unsigned char get_next(FILE *f);
 void one_field(FILE *f, unsigned char byte);
 /* print na tela um campo da estrutura */
 
-void one_struct(FILE *f);
-/* print na tela uma estrutura */
-
 long one_num(FILE *f);
 /* retorna o numero guardado no par chave-valor */
-
-unsigned long one_num_byte(unsigned char byte, int n);
-/* retorna a porcao varint de um byte */
-
 
 int code (char* desc, void* v, FILE* f)
 {
@@ -103,30 +97,23 @@ void codeValue(char *desc, int inx, void *v, FILE *f) {
 }
 
 void printValue(char type, long value, FILE *f) {
-	unsigned long val;
-	int bitSize, byteSize, i;
-	unsigned char *codedValue;
+  unsigned long val;
+  int i=0;
+  unsigned char codedValue[MAX];
 
-	val = value << 1;
-	if (value < 0)
-		val = ~val;
+  val = value << 1;
+  if (value < 0)
+    val = ~val;
 
-	bitSize = numBits(val);
-	byteSize = (bitSize/7) + 1;
-	
-	codedValue = (unsigned char*)malloc(byteSize*sizeof(char));
-	if (codedValue == NULL) {
-		printf("Erro: faltou memoria.\n");
-		return;
-	}
+  do {
+    codedValue[i] = val | 0x80;
+    val >>= 7;
+    i++;
+  } while (val);
 
-	for (i=0; i<byteSize-1; i++) {
-		codedValue[i] = val | 0x80;
-		val >>= 7;
-	}
-	codedValue[i] = val;
+  codedValue[i-1] &= 0x7f;
 
-	fwrite(codedValue, 1, byteSize, f);
+  fwrite(codedValue, 1, i, f);
 }
 
 int numBits (long value) {
@@ -143,6 +130,7 @@ int numBits (long value) {
 int decode (FILE *f)
 {
     int i=1;
+    unsigned char c;
 
 	if(f == NULL)
 	{
@@ -153,26 +141,19 @@ int decode (FILE *f)
 	while(get_next(f) == 0xFF)							/*	enquanto ainda há marca FF no arquivo*/
 	{
 		printf("----------------------\nEstrutura %d\n",i);
-		one_struct(f);
+
+    	c = get_next(f);
+    
+   		while(c & 0x80)                             /* confere se é o ultimo campo */
+    	{
+        	one_field(f,c);
+        	c = get_next(f);
+   		}
+    	one_field(f,c);		
 		i++;
 	}							
 
 	return 0;
-}
-
-void one_struct(FILE *f)
-{
-    unsigned char c;
-    
-    c = get_next(f);
-    
-    while(c & 0x80)                             /* confere se é o ultimo campo */
-    {
-        one_field(f,c);
-        c = get_next(f);
-    }
-    
-    one_field(f,c);								/* processa ultimo campo */
 }
 
 void one_field(FILE *f, unsigned char byte)
@@ -193,37 +174,27 @@ long one_num(FILE *f)
     unsigned char byte;
     unsigned long numu = 0;
     long nums;
-    int i;
-    
-    
-    for(i=0,byte = get_next(f); byte & 0x80 ; i++,byte = get_next(f)) /* vai de byte a byte do valor conferindo se é o ultimo*/
-        numu = numu + one_num_byte(byte, i);
-    
-    numu = numu + one_num_byte(byte, i);                /* adiciona o valor do ultimo */
-    
+    int i = 0;
+
+    do {
+     byte = get_next(f);
+     numu |= ((unsigned long)(byte & 0x7f)) << (7 * i);
+     i++;
+    } while (byte & 0x80);
+
     nums = numu >>  1;
     if (numu & 0x01)                                     /* dado como dica no enunciado */
         nums = ~nums;
-    
+
     return nums;
 }
-
-unsigned long one_num_byte(unsigned char byte, int n)
-{
-    unsigned long num;
-    
-    num = byte & 0x7F;                                  /* seta o bit mais a esquerda a 0 */
-    num = num << 7*n;                                   /* da shift para a esquerda o num de significancia do byte */
-    
-    return num;
-}
-
 
 unsigned char get_next(FILE *f)
 {
     unsigned char c;
     
     fread(&c,1,1,f);
+    //c = (unsigned char) fgetc(f);
     
     return c;
 }
